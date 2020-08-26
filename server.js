@@ -50,6 +50,7 @@ scalar DateTime
         buildings(id: Int!): Building
         interventions(id: Int!): Intervention
         employees(id: Int!): Employee
+        customers(email: String!): Customer
     },
 
     type Building {
@@ -138,7 +139,7 @@ var root = {
     buildings: getBuildings,
     interventions: getInterventions,
     employees: getEmployees,
-    email: getEmail
+    customers: getCustomers
 };
 
 
@@ -161,9 +162,9 @@ async function getInterventions({id}) {
     return resolve
 };
 
-async function getEmail({email}) {
+async function getCustomers({email}) {
 
-   var email = await query_mysql('SELECT * FROM users WHERE email = ' + email)
+   var email = await query_mysql(`SELECT * FROM users WHERE email = "${email}"`)
    resolve = email[0]
    console.log(email)
 
