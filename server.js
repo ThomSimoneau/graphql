@@ -50,7 +50,10 @@ scalar DateTime
         buildings(id: Int!): Building
         interventions(id: Int!): Intervention
         employees(id: Int!): Employee
-        customers(email: String!): Customer
+        customersEmail(email: String!): Customer
+        customerId(id: Int!): Customer
+        buildingOfCustomer(id: Int!): Building
+        
     },
 
     type Building {
@@ -139,7 +142,9 @@ var root = {
     buildings: getBuildings,
     interventions: getInterventions,
     employees: getEmployees,
-    customers: getCustomers
+    customersEmail: getCustomers,
+    customerId: getCustomerId,
+    buildingOfCustomer: getBuildingsOfCustomer
 };
 
 
@@ -164,9 +169,10 @@ async function getInterventions({id}) {
 
 async function getCustomers({email}) {
 
-   var email = await query_mysql(`SELECT * FROM users WHERE email = "${email}"`)
+   var email = await query_mysql(`SELECT * FROM customers WHERE email = "${email}"`)
    resolve = email[0]
    console.log(email)
+   console.log("TEST")
 
    return resolve
 
@@ -191,6 +197,30 @@ async function getBuildings({id}) {
 
     return resolve
 };
+
+async function getCustomerId({id}) {
+
+    //Query customer info from the MySQL table
+    customer = await query_mysql('SELECT * FROM customers WHERE id = ' + id)
+
+    resolve= customer[0];
+
+    return resolve
+};
+
+async function getBuildingsOfCustomer({id}) {
+    // Query building from the MySQL table
+    var buildings = await query_mysql('SELECT * FROM buildings WHERE customer_id = ' + id )
+    resolve = buildings[0]
+    console.log(buildings)
+
+
+    
+    
+    return resolve
+};
+
+
 
 //To answer Question 3 by employee id
 async function getEmployees({id}) {
