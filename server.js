@@ -50,9 +50,9 @@ scalar DateTime
         buildings(id: Int!): Building
         interventions(id: Int!): Intervention
         employees(id: Int!): Employee
-        customersEmail(email: String!): Customer
-        customerId(id: Int!): Customer
-        buildingOfCustomer(id: Int!): Building
+        customers(email: String!): Customer
+        customerId(email: String!): Customer
+        buildingOfCustomer(email: String!): [Building]
         
     },
 
@@ -142,7 +142,7 @@ var root = {
     buildings: getBuildings,
     interventions: getInterventions,
     employees: getEmployees,
-    customersEmail: getCustomers,
+    customers: getCustomers,
     customerId: getCustomerId,
     buildingOfCustomer: getBuildingsOfCustomer
 };
@@ -166,7 +166,7 @@ async function getInterventions({id}) {
 
     return resolve
 };
-
+//         WORKS
 async function getCustomers({email}) {
 
    var email = await query_mysql(`SELECT * FROM customers WHERE email = "${email}"`)
@@ -198,25 +198,27 @@ async function getBuildings({id}) {
     return resolve
 };
 
-async function getCustomerId({id}) {
+//            WORKS
+async function getCustomerId({email}) {
 
     //Query customer info from the MySQL table
-    customer = await query_mysql('SELECT * FROM customers WHERE id = ' + id)
+    customer = await query_mysql(`SELECT * FROM customers WHERE email = "${email}"`)
 
     resolve= customer[0];
 
     return resolve
 };
 
-async function getBuildingsOfCustomer({id}) {
+async function getBuildingsOfCustomer({email}) {
+    //console.log("-------------------------BEFORE THE CALL----------------------------------------")
+   
     // Query building from the MySQL table
-    var buildings = await query_mysql('SELECT * FROM buildings WHERE customer_id = ' + id )
-    resolve = buildings[0]
+    var buildings = await query_mysql(`SELECT b.id FROM buildings b JOIN customers c ON b.customer_id = c.id WHERE c.email = "${email}"` )
+    resolve = buildings
+    //console.log("-----------------------------------------------------------------")
     console.log(buildings)
 
 
-    
-    
     return resolve
 };
 
