@@ -53,7 +53,9 @@ scalar DateTime
         customers(email: String!): Customer
         customerId(email: String!): Customer
         buildingOfCustomer(email: String!): [Building]
-        
+        batteries(id: Int!): [Battery]
+        columns(email: String!): [Column]
+        elevators(email: String!): [Elevator]
     },
 
     type Building {
@@ -135,6 +137,40 @@ scalar DateTime
         status: String
         address: Address
     }
+    type Battery {
+        id: Int!
+        building_id: Int
+        type_of_battery: String
+        status: String
+        employee_id: Int
+        date_of_comissioning: DateTime
+        date_of_last_inspection: DateTime
+        certificate_of_operation: Text
+        information: Text
+        notes: Text
+    }
+    type Column {
+        int: Int!
+        battery_id: Int
+        type_of_column: String
+        number_of_floors_served: Int
+        status: String
+        information: Text
+        notes: Text
+    }
+    type Elevator {
+        int: Int!
+        column_id: Int
+        type_of_building: String
+        serial_number: Int
+        model: String
+        status: String
+        date_of_commissioning: DateTime
+        date_of_last_inspection: DateTime
+        certificate_of_operations: Text
+        information: Text
+        notes: Text
+    }
 `);
 
 // Root resolver
@@ -144,7 +180,10 @@ var root = {
     employees: getEmployees,
     customers: getCustomers,
     customerId: getCustomerId,
-    buildingOfCustomer: getBuildingsOfCustomer
+    buildingOfCustomer: getBuildingsOfCustomer,
+    batteries: getBatteries,
+    columns: getColumns,
+    elevators: getElevators
 };
 
 
@@ -169,14 +208,31 @@ async function getInterventions({id}) {
 //         WORKS
 async function getCustomers({email}) {
 
-   var email = await query_mysql(`SELECT * FROM customers WHERE email = "${email}"`)
+   var email = await query_mysql(`SELECT * FROM customers WHERE email = ${email}`)
    resolve = email[0]
    console.log(email)
-   console.log("TEST")
-
    return resolve
-
 };
+
+async function getBatteries({email}) {
+
+    var email = await query_mysql(`
+        SELECT a.id, 
+               a.building.id, 
+               a.type_of_battery, 
+               a.status, 
+               a.date_of_commissioning, 
+               a.date_of_last_inspection, 
+               a.certificate_of_operations, 
+               a.information, 
+               a.notes 
+        FROM batteries a JOIN building b ON a.building_id = b.id JOIN customers c ON c.id = b.customer_id  WHERE email = ${email}`)
+    resolve = email
+    console.log(email)
+    return resolve
+
+}
+
 
 //To answer Question 2 by building id
 async function getBuildings({id}) {
@@ -202,7 +258,7 @@ async function getBuildings({id}) {
 async function getCustomerId({email}) {
 
     //Query customer info from the MySQL table
-    customer = await query_mysql(`SELECT * FROM customers WHERE email = "${email}"`)
+    customer = await query_mysql(`SELECT * FROM customers WHERE email = ${email}`)
 
     resolve= customer[0];
 
@@ -210,12 +266,12 @@ async function getCustomerId({email}) {
 };
 
 async function getBuildingsOfCustomer({email}) {
-    //console.log("-------------------------BEFORE THE CALL----------------------------------------")
+    //console.log(-------------------------BEFORE THE CALL----------------------------------------)
    
     // Query building from the MySQL table
-    var buildings = await query_mysql(`SELECT b.id FROM buildings b JOIN customers c ON b.customer_id = c.id WHERE c.email = "${email}"` )
+    var buildings = await query_mysql(`SELECT b.id FROM buildings b JOIN customers c ON b.customer_id = c.id WHERE c.email = ${email}` )
     resolve = buildings
-    //console.log("-----------------------------------------------------------------")
+    //console.log(-----------------------------------------------------------------)
     console.log(buildings)
 
 
