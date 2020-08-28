@@ -53,7 +53,7 @@ scalar DateTime
         customers(email: String!): Customer
         customerId(email: String!): Customer
         buildingOfCustomer(email: String!): [Building]
-        batteries(id: Int!): [Battery]
+        batteries(email: String!): [Battery]
         columns(email: String!): [Column]
         elevators(email: String!): [Elevator]
     },
@@ -226,7 +226,7 @@ async function getBatteries({email}) {
                a.certificate_of_operations, 
                a.information, 
                a.notes 
-        FROM batteries a JOIN building b ON a.building_id = b.id JOIN customers c ON c.id = b.customer_id  WHERE email = ${email}`)
+        FROM batteries a JOIN building b ON a.building_id = b.id JOIN customers c ON c.id = b.customer_id  WHERE c.email = ${email}`)
     resolve = email
     console.log(email)
     return resolve
