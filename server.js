@@ -216,7 +216,7 @@ async function getCustomers({email}) {
 
 async function getBatteries({email}) {
 
-    var customer = await query_mysql(`
+    var email = await query_mysql(`
         SELECT a.id, 
                a.building.id, 
                a.type_of_battery, 
@@ -315,6 +315,15 @@ async function getEmployees({id}) {
     return resolve
 };
 
+
+function getCustomerInfo() {
+
+    var info = await query_mysql('SELECT * FROM employees WHERE id = ' + id )
+
+
+
+
+}
 
 // Function used to query the MySQL operational DB BEGIN
 function query_mysql (queryStr) {
