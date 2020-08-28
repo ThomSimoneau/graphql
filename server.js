@@ -208,7 +208,7 @@ async function getInterventions({id}) {
 //         WORKS
 async function getCustomers({email}) {
 
-   var email = await query_mysql(`SELECT * FROM customers WHERE email = ${email}`)
+   var email = await query_mysql(`SELECT * FROM customers WHERE email = "${email}"`)
    resolve = email[0]
    console.log(email)
    return resolve
@@ -267,7 +267,7 @@ async function getBuildings({id}) {
 async function getCustomerId({email}) {
 
     //Query customer info from the MySQL table
-    customer = await query_mysql(`SELECT * FROM customers WHERE email = ${email}`)
+    customer = await query_mysql(`SELECT * FROM customers WHERE email = "${email}"`)
 
     resolve= customer[0];
 
