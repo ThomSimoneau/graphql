@@ -145,9 +145,9 @@ scalar DateTime
         employee_id: Int
         date_of_comissioning: DateTime
         date_of_last_inspection: DateTime
-        certificate_of_operation: Text
-        information: Text
-        notes: Text
+        certificate_of_operation: String
+        information: String
+        notes: String
     }
     type Column {
         int: Int!
@@ -155,8 +155,8 @@ scalar DateTime
         type_of_column: String
         number_of_floors_served: Int
         status: String
-        information: Text
-        notes: Text
+        information: String
+        notes: String
     }
     type Elevator {
         int: Int!
@@ -167,9 +167,9 @@ scalar DateTime
         status: String
         date_of_commissioning: DateTime
         date_of_last_inspection: DateTime
-        certificate_of_operations: Text
-        information: Text
-        notes: Text
+        certificate_of_operations: String
+        information: String
+        notes: String
     }
 `);
 
@@ -230,9 +230,18 @@ async function getBatteries({email}) {
     resolve = email
     console.log(email)
     return resolve
+}
+
+async function getColumns({email}){
+
 
 }
 
+async function getElevators({email}){
+
+
+    
+}
 
 //To answer Question 2 by building id
 async function getBuildings({id}) {
