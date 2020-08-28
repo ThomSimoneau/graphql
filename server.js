@@ -240,7 +240,7 @@ async function getColumns({email}){
 async function getElevators({email}){
 
 
-    
+
 }
 
 //To answer Question 2 by building id
@@ -278,7 +278,7 @@ async function getBuildingsOfCustomer({email}) {
     //console.log(-------------------------BEFORE THE CALL----------------------------------------)
    
     // Query building from the MySQL table
-    var buildings = await query_mysql(`SELECT b.id FROM buildings b JOIN customers c ON b.customer_id = c.id WHERE c.email = ${email}` )
+    var buildings = await query_mysql(`SELECT b.id FROM buildings b JOIN customers c ON b.customer_id = c.id WHERE c.email = "${email}"` )
     resolve = buildings
     //console.log(-----------------------------------------------------------------)
     console.log(buildings)
