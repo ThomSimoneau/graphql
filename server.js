@@ -56,6 +56,7 @@ scalar DateTime
         batteries(email: String!): [Battery]
         columns(email: String!): [Column]
         elevators(email: String!): [Elevator]
+        elevatorsOfColumn(id: Int!): [Elevator]
     },
 
     type Building {
@@ -150,7 +151,7 @@ scalar DateTime
         notes: String
     }
     type Column {
-        int: Int!
+        id: Int!
         battery_id: Int
         type_of_column: String
         number_of_floors_served: Int
@@ -159,7 +160,7 @@ scalar DateTime
         notes: String
     }
     type Elevator {
-        int: Int!
+        id: Int!
         column_id: Int
         type_of_building: String
         serial_number: Int
@@ -181,9 +182,11 @@ var root = {
     customers: getCustomers,
     customerId: getCustomerId,
     buildingOfCustomer: getBuildingsOfCustomer,
+    elevatorsOfColumn: getElevatorsOfColumn,
     batteries: getBatteries,
     columns: getColumns,
     elevators: getElevators
+    
 };
 
 
@@ -208,9 +211,9 @@ async function getInterventions({id}) {
 //         WORKS
 async function getCustomers({email}) {
 
-   var email = await query_mysql(`SELECT * FROM customers WHERE email = "${email}"`)
-   resolve = email[0]
-   console.log(email)
+   var id = await query_mysql(`SELECT id FROM customers WHERE email = "${email}"`)
+   resolve = id[0]
+   console.log(id)
    return resolve
 };
 
@@ -218,16 +221,15 @@ async function getBatteries({email}) {
 
     var email = await query_mysql(`
         SELECT a.id, 
-               a.building.id, 
+               a.building_id, 
                a.type_of_battery, 
                a.status, 
-               a.date_of_commissioning, 
+               a.date_of_comissioning, 
                a.date_of_last_inspection, 
-               a.certificate_of_operations, 
+               a.certificate_of_operation, 
                a.information, 
                a.notes 
-        FROM batteries a JOIN building b ON a.building_id = b.id JOIN customers c ON c.id = b.customer_id  WHERE c.email = ${email}`)
-    //var building = await query_mysql(`SELECT * FROM buildings WHERE id = ' + id`)
+        FROM batteries a JOIN buildings b ON a.building_id = b.id JOIN customers c ON b.customer_id = c.id WHERE c.email = "${email}"`)
     
     resolve = email
     console.log(email)
@@ -235,12 +237,49 @@ async function getBatteries({email}) {
 }
 
 async function getColumns({email}){
-
-
+    var email = await query_mysql(
+        `SELECT d.id,
+                d.battery_id,
+                d.type_of_column,
+                d.number_of_floors_served,
+                d.status,
+                d.information,
+                d.notes
+        FROM batteries a JOIN buildings b ON a.building_id = b.id JOIN columns d ON a.id = d.battery_id JOIN customers c ON b.customer_id = c.id WHERE c.email = "${email}"`)
+    
+    resolve = email
+    console.log(email)
+    return resolve
 }
+async function getElevatorsOfColumn({id}){
+
+    var elevators = await query_mysql(`SELECT e.id, e.column_id FROM elevators e JOIN columns c ON e.column_id = c.id WHERE c.id = "${id}"`)
+
+    resolve = elevators
+    return resolve
+}
+
+
 
 async function getElevators({email}){
 
+    var elevators = await query_mysql(
+        `SELECT e.id,
+                e.column_id,
+                e.type_of_building,
+                e.serial_number,
+                e.model,
+                e.status,
+                e.date_of_commissioning,
+                e.date_of_last_inspection,
+                e.certificate_of_operations,
+                e.information,
+                e.notes
+        FROM batteries a JOIN buildings b ON a.building_id = b.id JOIN columns d ON a.id = d.battery_id JOIN elevators e ON d.id = e.column_id JOIN customers c ON b.customer_id = c.id WHERE c.email = "${email}"`)
+    
+    resolve = elevators
+    console.log(elevators)
+    return resolve
 
 
 }
@@ -316,10 +355,10 @@ async function getEmployees({id}) {
 };
 
 
-function getCustomerInfo() {
+async function getCustomerInfo() {
 
-    var info = await query_mysql('SELECT * FROM employees WHERE id = ' + id )
-
+    var info = await query_mysql('SELECT * FROM  WHERE id = ' + id )
+    
 
 
 
