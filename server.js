@@ -216,7 +216,7 @@ async function getCustomers({email}) {
 
 async function getBatteries({email}) {
 
-    var email = await query_mysql(`
+    var customer = await query_mysql(`
         SELECT a.id, 
                a.building.id, 
                a.type_of_battery, 
@@ -227,6 +227,8 @@ async function getBatteries({email}) {
                a.information, 
                a.notes 
         FROM batteries a JOIN building b ON a.building_id = b.id JOIN customers c ON c.id = b.customer_id  WHERE c.email = ${email}`)
+    //var building = await query_mysql(`SELECT * FROM buildings WHERE id = ' + id`)
+    
     resolve = email
     console.log(email)
     return resolve
