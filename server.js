@@ -56,7 +56,26 @@ scalar DateTime
         batteries(email: String!): [Battery]
         columns(email: String!): [Column]
         elevators(email: String!): [Elevator]
+        batteriesOfBuilding(id: Int!): [Battery]
+        columnsOfBattery(id: Int!): [Column]
         elevatorsOfColumn(id: Int!): [Elevator]
+        
+    },
+    type Mutation {
+        intervention(
+            customer_id: Int, 
+            building_id: Int, 
+            battery_id: Int, 
+            column_id: Int, 
+            elevator_id: Int, 
+            date_started: DateTime,
+            date_ended: DateTime,
+            result: String,
+            status: String,
+            report: String): InterventionSQL
+
+
+
     },
 
     type Building {
@@ -138,6 +157,22 @@ scalar DateTime
         status: String
         address: Address
     }
+    type InterventionSQL {
+        id: Int
+        customer_id: Int
+        building_id: Int
+        battery_id: String
+        column_id: String
+        elevator_id: String
+        date_started: DateTime
+        date_ended: DateTime
+        result: String 
+        report: String
+        status: String
+        address: Address
+        
+    }
+
     type Battery {
         id: Int!
         building_id: Int
@@ -182,10 +217,13 @@ var root = {
     customers: getCustomers,
     customerId: getCustomerId,
     buildingOfCustomer: getBuildingsOfCustomer,
+    batteriesOfBuilding: getBatteriesOfBuilding,
+    columnsOfBattery: getColumnsOfBattery,
     elevatorsOfColumn: getElevatorsOfColumn,
     batteries: getBatteries,
     columns: getColumns,
-    elevators: getElevators
+    elevators: getElevators,
+    intervention: createIntervention
     
 };
 
@@ -211,7 +249,7 @@ async function getInterventions({id}) {
 //         WORKS
 async function getCustomers({email}) {
 
-   var id = await query_mysql(`SELECT id FROM customers WHERE email = "${email}"`)
+   var id = await query_mysql(`SELECT id, email FROM customers WHERE email = "${email}"`)
    resolve = id[0]
    console.log(id)
    return resolve
@@ -251,6 +289,25 @@ async function getColumns({email}){
     console.log(email)
     return resolve
 }
+
+async function getBatteriesOfBuilding({id}) {
+
+    var batteries = await query_mysql(`SELECT b.id, b.building_id FROM batteries b JOIN buildings a ON b.building_id = a.id WHERE a.id = "${id}"`)
+
+    resolve = batteries
+    return resolve
+
+}
+
+async function getColumnsOfBattery({id}) {
+
+    var columns = await query_mysql(`SELECT c.id, c.battery_id FROM columns c JOIN batteries b ON c.battery_id = b.id WHERE b.id = "${id}"`)
+
+    resolve = columns
+    return resolve
+
+}
+
 async function getElevatorsOfColumn({id}){
 
     var elevators = await query_mysql(`SELECT e.id, e.column_id FROM elevators e JOIN columns c ON e.column_id = c.id WHERE c.id = "${id}"`)
@@ -316,12 +373,11 @@ async function getCustomerId({email}) {
 };
 
 async function getBuildingsOfCustomer({email}) {
-    //console.log(-------------------------BEFORE THE CALL----------------------------------------)
    
     // Query building from the MySQL table
-    var buildings = await query_mysql(`SELECT b.id FROM buildings b JOIN customers c ON b.customer_id = c.id WHERE c.email = "${email}"` )
+    var buildings = await query_mysql(`SELECT * FROM buildings b JOIN customers c ON b.customer_id = c.id WHERE c.email = "${email}"` )
     resolve = buildings
-    //console.log(-----------------------------------------------------------------)
+    
     console.log(buildings)
 
 
@@ -355,14 +411,17 @@ async function getEmployees({id}) {
 };
 
 
-async function getCustomerInfo() {
+async function createIntervention({customer_id, building_id, battery_id, column_id, elevator_id, report, author_id}) {
 
-    var info = await query_mysql('SELECT * FROM  WHERE id = ' + id )
     
-
-
-
-}
+        intervention = await query_mysql(
+          "INSERT INTO interventions (report, created_at, updated_at, battery_id, column_id, elevator_id, building_id, customer_id  ) VALUES('" + report +"', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(),'" + battery_id +"','" + column_id +"','" + elevator_id +"','" + building_id + "','" + customer_id + "');"
+        );
+        intervStartShow = await query_mysql('SELECT * FROM interventions WHERE id = ' + intervention.insertId);
+        console.log(intervention)
+        resolve = intervStartShow[0];
+        return resolve
+    };
 
 // Function used to query the MySQL operational DB BEGIN
 function query_mysql (queryStr) {
