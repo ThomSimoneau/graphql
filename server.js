@@ -198,7 +198,7 @@ scalar DateTime
         id: Int!
         column_id: Int
         type_of_building: String
-        serial_number: Int
+        serial_number: String
         model: String
         status: String
         date_of_commissioning: DateTime
